@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\GetProductsAction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Section;
 
 class GetProductsController extends Controller
 {
@@ -205,5 +206,19 @@ class GetProductsController extends Controller
     {
         //Return GB default for the purpose of the test
         return ['country' => 'GB'];
+    }
+
+    public function getSection($section) {
+        // Following will return id of selected Section 
+        $sectionId = Section::select('id')->where('description', $section)->get();
+
+        // Check if sectionId Collection has result in it
+        if (!$sectionId->isEmpty()) {
+            // if so call getStoreProductsBySectionWithPaginationAndSorting() and return result
+            return $this->getStoreProductsBySectionWithPaginationAndSorting($this->storeId, $sectionId[0]->id, $_GET['number'] ?? null, $_GET['page'] ?? null, $_GET['sort'] ?? 0);
+        }else{
+            // else given section is not in DB
+            return ['result' => 'No Product found for give section!'];
+        }
     }
 }
